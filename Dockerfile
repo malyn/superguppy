@@ -1,3 +1,12 @@
+# syntax=docker/dockerfile:1
+
+########################################################################
+## xx Cross-Compilation Helper
+########################################################################
+
+FROM --platform=${BUILDPLATFORM} tonistiigi/xx:1.2.1 AS xx
+
+
 ########################################################################
 ## Ground Control
 ########################################################################
@@ -9,10 +18,15 @@ FROM ghcr.io/malyn/groundcontrol AS groundcontrol
 ## Ktra
 ########################################################################
 
-FROM rust:1.68.0-alpine3.17 AS ktra
+FROM --platform=${BUILDPLATFORM} rust:1.68.2-alpine3.17 as ktra
 
+# Copy over the xx cross-compilation helpers, then install the required
+# compilers, linkers and development libraries (for both
+# cross-compilation, and for Ktra itself).
+COPY --from=xx / /
 RUN apk update && \
     apk add --no-cache \
+        clang lld \
         musl-dev \
         zlib-dev \
         openssl-dev \
@@ -24,12 +38,17 @@ RUN tar -xzf /tmp/ktra.tar.gz --strip-components=1
 
 # Need to upgrade git2 to 0.14, since 0.13 has a bug that affects Ktra:
 # https://github.com/rust-lang/git2-rs/issues/824
-RUN cargo add git2@0.14
+RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo add git2@0.14
 
-# Need to tell Rust *not* to link statically with musl, otherwise
-# openssl-sys will crash during initialization. More info here:
+# Build the Rust binary (for the target platform). Need to tell Rust
+# *not* to link statically with musl, otherwise openssl-sys will crash
+# during initialization. More info here:
 # https://github.com/sfackler/rust-openssl/issues/1620#issuecomment-1100288444
-RUN RUSTFLAGS="-C target-feature=-crt-static" cargo build --release
+ARG TARGETPLATFORM
+RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse RUSTFLAGS="-C target-feature=-crt-static" \
+    xx-cargo build --release --target-dir ./build && \
+    xx-verify ./build/$(xx-cargo --print-target-triple)/release/ktra && \
+    cp ./build/$(xx-cargo --print-target-triple)/release/ktra /ktra
 
 
 ########################################################################
@@ -75,7 +94,7 @@ RUN adduser \
 WORKDIR /app
 
 COPY --from=groundcontrol /groundcontrol ./
-COPY --from=ktra /target/release/ktra ./
+COPY --from=ktra /ktra ./
 COPY --from=tailscale /usr/local/bin/tailscaled ./
 COPY --from=tailscale /usr/local/bin/tailscale ./
 
