@@ -1,0 +1,12 @@
+/.git
+/.github
+/.vscode
+.dockerignore
+.editorconfig
+.gitattributes
+.gitignore
+.prettierc
+Dockerfile
+Justfile
+package*.json
+README.md

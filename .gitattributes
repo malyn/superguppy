@@ -1,0 +1,3 @@
+# NPM files are always saved as LF, even on Windows.
+package.json text eol=lf
+package-lock.json text eol=lf

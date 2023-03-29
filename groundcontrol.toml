@@ -1,0 +1,58 @@
+[[processes]]
+name = "tailscaled"
+run = [
+    "/app/tailscaled",
+    "--state=/data/tailscale/tailscaled.state",
+    "--socket=/var/run/tailscale/tailscaled.sock",
+    "--tun=userspace-networking",
+]
+
+[[processes]]
+name = "tailscale-up"
+pre = "/app/tailscale up --hostname {{PRIVATE_REPO_HOSTNAME}}"
+
+[[processes]]
+name = "fcgiwrap"
+# uid 10001 is the `git` user.
+#
+# We clear the environment variables, otherwise Git will use the `USER`
+# variable to look for the Git config (which fails, because `USER` is
+# still `root`).
+run = { only-env = [], command = "/usr/bin/spawn-fcgi -n -s /var/run/fcgiwrap.sock -u 10001 -- /usr/bin/fcgiwrap" }
+
+[[processes]]
+name = "nginx"
+# NGINX runs as the `git` user, which needs to be able to write to the
+# NGINX temp directory. (the NGINX package created those directories and
+# set them to `nginx:nginx`; we *could* change ownership in the
+# Dockerfile, but putting this in the Ground Control file means that all
+# user-related stuff is in the same place)
+pre = "/bin/chown -R git:git /var/lib/nginx/tmp"
+run = { only-env = [], command = [ "/usr/sbin/nginx", "-g", "daemon off; user git;" ] }
+
+[[processes]]
+name = "git-dirs"
+pre = "/usr/bin/install --owner=git --group=git --mode=0755 -d /data/git"
+
+# Perform one-time initialization of the Git repo used by Ktra. This
+# makes the Docker image completely standalone as it is able to take an
+# empty Fly volume and initialize it with a Git repo that bootstraps the
+# private repository.
+#
+# We clear the environment variables, otherwise Git will use the `USER`
+# variable to look for the Git config (which fails, because `USER` is
+# still `root`).
+[[processes]]
+name = "git-init"
+pre = { user = "git", only-env = [], command = "/app/git-init.sh /data/git/index {{PRIVATE_REPO_HOSTNAME}}" }
+
+# Ktra checks for access to the Git index and thus must start *after*
+# NGINX has started *and* the index has been initialized the first time.
+#
+# We clear the environment variables, otherwise Ktra will use the `USER`
+# variable to look for the Git config (which fails, because `USER` is
+# still `root`).
+[[processes]]
+name = "ktra"
+pre = "/usr/bin/install --owner=ktra --group=ktra --mode=0755 -d /data/ktra"
+run = { user = "ktra", only-env = [], command = "/app/ktra --config /app/ktra.toml" }

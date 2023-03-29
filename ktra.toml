@@ -1,0 +1,14 @@
+[server_config]
+address = [127, 0, 0, 1]
+port = 8000
+
+[db_config]
+db_dir_path = "/data/ktra/db"
+
+[crate_files_config]
+dl_dir_path = "/data/ktra/crates/private"
+cache_dir_path = "/data/ktra/crates/crates_io"
+
+[index_config]
+remote_url = "http://localhost/git/index"
+local_path = "/data/ktra/index"
