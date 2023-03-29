@@ -22,13 +22,20 @@ run = { only-env = [], command = "/usr/bin/spawn-fcgi -n -s /var/run/fcgiwrap.so
 
 [[processes]]
 name = "nginx"
-# NGINX runs as the `git` user, which needs to be able to write to the
-# NGINX temp directory. (the NGINX package created those directories and
-# set them to `nginx:nginx`; we *could* change ownership in the
-# Dockerfile, but putting this in the Ground Control file means that all
-# user-related stuff is in the same place)
-pre = "/bin/chown -R git:git /var/lib/nginx/tmp"
 run = { only-env = [], command = [ "/usr/sbin/nginx", "-g", "daemon off; user git;" ] }
+
+# NGINX runs as the `git` user, which needs to be able to access the
+# NGINX directory (and write to the tmp directory). (the NGINX package
+# created those directories and set them to `nginx:nginx`; we *could*
+# change ownership in the Dockerfile, but putting this in the Ground
+# Control file means that all user-related stuff is in the same place)
+[[processes]]
+name = "fix-nginx-perms"
+pre = "/bin/chown git:git /var/lib/nginx"
+
+[[processes]]
+name = "fix-nginx-tmp-perms"
+pre = "/bin/chown -R git:git /var/lib/nginx/tmp"
 
 [[processes]]
 name = "git-dirs"
