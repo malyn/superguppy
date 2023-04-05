@@ -9,9 +9,13 @@ registry server. Security and authorization is provided by
 own machine), but Super Guppy is primarily tested with Fly.io and Docker
 Desktop.
 
+See [this blog post][superguppypost] for more information on the genesis
+of Super Guppy.
+
 [altcargo]:
     https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry
 [ktra]: https://github.com/moriturus/ktra
+[superguppypost]: https://michaelalynmiller.com/blog/2023/04/05/private-cargo-registries/
 [tailscale]: https://tailscale.com/
 
 ## Setup Instructions
