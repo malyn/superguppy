@@ -65,11 +65,11 @@ All of these steps are performed in the
         // ...
 
         // All users, and GitHub Actions, can access the private Cargo registry.
-    	{
-    		"action": "accept",
-    		"src":    ["autogroup:members", "tag:github"],
-    		"dst":    ["crates:80"],
-    	},
+        {
+            "action": "accept",
+            "src":    ["autogroup:members", "tag:github"],
+            "dst":    ["crates:80"],
+        },
 
         // ...
     ],
