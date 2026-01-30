@@ -198,19 +198,19 @@ $ cargo login --registry=mysecretregistry yourrandomtokenappearsrighthere
 ## Conduct
 
 This project adheres to the
-[Contributor Covenant Code of Conduct](https://github.com/malyn/superguppy/blob/main/CODE_OF_CONDUCT.md).
+[Contributor Covenant Code of Conduct](https://codeberg.org/malyn/superguppy/raw/branch/main/CODE_OF_CONDUCT.md).
 This describes the minimum behavior expected from all contributors.
 
 ## License
 
 Licensed under either of
 
--   Apache License, Version 2.0
-    ([LICENSE-APACHE](https://github.com/malyn/superguppy/blob/main/LICENSE-APACHE)
-    or <https://www.apache.org/licenses/LICENSE-2.0>)
--   MIT license
-    ([LICENSE-MIT](https://github.com/malyn/superguppy/blob/main/LICENSE-MIT) or
-    <https://opensource.org/licenses/MIT>)
+- Apache License, Version 2.0
+  ([LICENSE-APACHE](https://codeberg.org/malyn/superguppy/raw/branch/main/LICENSE-APACHE)
+  or <https://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license
+  ([LICENSE-MIT](https://codeberg.org/malyn/superguppy/raw/branch/main/LICENSE-MIT)
+  or <https://opensource.org/licenses/MIT>)
 
 at your option.
 
